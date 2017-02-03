@@ -28,7 +28,7 @@ app.get('/todos', function(req, res) {
 app.get('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 	for (var i = 0; i < todos.length; i++) {
-		if (todos[i].id === req.params.id)
+		if (todos[i].id === todoId)
 			res.json(todos[i]);
 	}
 	res.status(404).send();
