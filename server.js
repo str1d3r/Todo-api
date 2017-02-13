@@ -28,6 +28,12 @@ app.get('/todos', function(req, res) {
 			'completed': false
 		});
 	}
+
+	if (queryParams.hasOwnProperty('q') && _.isString(queryParams.q)) {
+		filteredTodos = _.filter(filteredTodos, function(desc) {
+			return (desc.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1);
+		});
+	}
 	res.json(filteredTodos);
 });
 
