@@ -60,9 +60,9 @@ app.delete('/todos/:id', function(req, res) {
 		todos = _.without(todos, matchedTodo);
 
 	} else {
-		res.status(404).json(
-			"no todo found with that id"
-		);
+		res.status(404).json({
+			"error": "no todo found with that id"
+		});
 	}
 });
 
