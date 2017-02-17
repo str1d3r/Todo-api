@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var bcrypt = require('bcrypt');
 var db = require('./db.js');
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -80,21 +81,21 @@ app.post('/todos', function(req, res) {
 // DELETE /todos/:id
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-			db.todo.destroy({
-				where: {
-					id:todoId
-				}
-			}).then(function(rowsDeleted){
-				if(rowsDeleted===0){
-					res.status(404).json({
-						error:'No todo with id'
-					});
-				}else{
-					res.status(204).send();
-				}
-			},function(){
-				res.status(500).send();
+	db.todo.destroy({
+		where: {
+			id: todoId
+		}
+	}).then(function(rowsDeleted) {
+		if (rowsDeleted === 0) {
+			res.status(404).json({
+				error: 'No todo with id'
 			});
+		} else {
+			res.status(204).send();
+		}
+	}, function() {
+		res.status(500).send();
+	});
 
 });
 
@@ -112,18 +113,17 @@ app.put('/todos/:id', function(req, res) {
 	if (body.hasOwnProperty('description')) {
 		attributes.description = body.description;
 	}
-	db.todo.findById(todoId).then(function(todo){
-		if(todo){
-			todo.update(attributes).then(function(todo){
+	db.todo.findById(todoId).then(function(todo) {
+		if (todo) {
+			todo.update(attributes).then(function(todo) {
 				res.json(todo.toJSON());
-			},function(e){
+			}, function(e) {
 				res.status(400).json(e);
 			});
-		}
-		else{
+		} else {
 			res.status(404).send();
 		}
-	},function(){
+	}, function() {
 		res.status(500).send();
 	})
 
@@ -142,7 +142,19 @@ app.post('/users', function(req, res) {
 });
 
 
-db.sequelize.sync().then(function() {
+// POST /users/login
+app.post('/users/login', function(req, res) {
+	var body = _.pick(req.body, "email", "password");
+
+	db.user.authenticate(body).then(function(user) {
+		res.json(user.toPublicJSON());
+	}, function() {
+		res.status(401).send();
+	});
+});
+
+
+db.sequelize.sync({force:true}).then(function() {
 
 	app.listen(PORT, function() {
 		console.log('Express listening on port ' + PORT + '!');
