@@ -1,3 +1,4 @@
+var _ = require('underscore');
 module.exports = function(sequelize, DataTypes) {
 	return sequelize.define('user', {
 		email: {
@@ -14,6 +15,15 @@ module.exports = function(sequelize, DataTypes) {
 			defaultValue: false,
 			validate: {
 				len: [7, 100]
+			}
+		}
+	},
+	{
+		hooks: {
+			beforeValidate: function(user,options){
+				if(_.isString(user.email))
+					user.email=user.email.toLowerCase();
+				
 			}
 		}
 	});
